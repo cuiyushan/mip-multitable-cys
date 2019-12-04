@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.unicom.mip.cys.mapper.RelMapper">
+    <resultMap id="BaseResultMap" type="cn.unicom.mip.cys.model.RelDO">
+        <id column="rel_id" jdbcType="INTEGER" property="relId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="org_id" jdbcType="INTEGER" property="orgId"/>
+        <result column="org_type" jdbcType="VARCHAR" property="orgType"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        rel_id, user_id, org_id, org_type
+    </sql>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from t_rel
+        where rel_id = #{relId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="cn.unicom.mip.cys.model.RelDO">
+        insert into t_rel (rel_id, user_id, org_id,
+        org_type)
+        values (#{relId,jdbcType=INTEGER},
+        #{userId,jdbcType=INTEGER},
+        #{orgId,jdbcType=INTEGER},
+        #{orgType,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyProperty="relId" useGeneratedKeys="true"
+            parameterType="cn.unicom.mip.cys.model.RelDO">
+        insert into t_rel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="relId != null">
+                rel_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="orgId != null">
+                org_id,
+            </if>
+            <if test="orgType != null">
+                org_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="relId != null">
+                #{relId,jdbcType=INTEGER},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="orgId != null">
+                #{orgId,jdbcType=INTEGER},
+            </if>
+            <if test="orgType != null">
+                #{orgType,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.unicom.mip.cys.model.RelDO">
+        update t_rel
+        set
+        <if test="userId != null">
+            user_id = #{userId,jdbcType=VARCHAR},
+        </if>
+        <if test="orgId != null">
+            org_id = #{orgId,jdbcType=VARCHAR},
+        </if>
+        <if test="orgType != null">
+            org_type = #{orgType,jdbcType=VARCHAR},
+        </if>
+        where rel_id = #{relId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.unicom.mip.cys.model.RelDO">
+        update t_rel
+        set
+        user_id = #{userId,jdbcType=INTEGER},
+        org_id = #{orgId,jdbcType=INTEGER},
+        org_type = #{orgType,jdbcType=VARCHAR},
+        where
+        rel_id = #{relId,jdbcType=INTEGER}
+    </update>
+</mapper>

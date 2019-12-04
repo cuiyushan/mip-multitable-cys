@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.unicom.mip.cys.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="cn.unicom.mip.cys.model.UserDO">
+        <id column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <!--配置1对多关系映射
+            property：在UserDO里面的List<RelDO>的属性名
+            ofType:当前account表的java类型
+            column:外键
+        -->
+        <collection property="relation" ofType="cn.unicom.mip.cys.model.RelDO" column="user_id">
+            <id property="relId" column="rel_id"></id>
+            <result property="orgId" column="org_id"></result>
+            <result property="orgType" column="org_type"></result>
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+        user_id, user_name
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+            resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_user
+        where user_id = #{userId,jdbcType=INTEGER}
+    </select>
+    <select id="selectAllUser" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_user
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from t_user
+        where user_id = #{userId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="cn.unicom.mip.cys.model.UserDO">
+        insert into t_user (user_id,
+        user_name)
+        values (#{userId,jdbcType=INTEGER},
+        #{userName,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyProperty="userId" useGeneratedKeys="true"
+            parameterType="cn.unicom.mip.cys.model.UserDO">
+        insert into t_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="userName != null">
+                user_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">
+                #{userId,jdbcType=INTEGER},
+            </if>
+            <if test="userName != null">
+                #{userName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.unicom.mip.cys.model.UserDO">
+        update t_user
+        set
+        <if test="userName != null">
+            user_name = #{userName,jdbcType=VARCHAR},
+        </if>
+        where user_id = #{userId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.unicom.mip.cys.model.UserDO">
+        update t_user
+        set
+        user_name = #{userName,jdbcType=VARCHAR},
+        where
+        user_id = #{userId,jdbcType=INTEGER}
+    </update>
+    <!--查询某个组织下的所有用户-->
+    <select id="selectAllUsersByOrgId" parameterType="java.lang.Integer"
+            resultMap="BaseResultMap">
+        select
+        u.user_id,u.user_name
+        from t_rel r left join t_user u
+        on r.user_id = u.user_id
+        where r.org_id = #{orgId,jdbcType=INTEGER}
+    </select>
+</mapper>

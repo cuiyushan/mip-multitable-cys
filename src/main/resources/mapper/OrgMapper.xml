@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.unicom.mip.cys.mapper.OrgMapper">
+    <resultMap id="BaseResultMap" type="cn.unicom.mip.cys.model.OrgDO">
+        <id column="org_id" jdbcType="INTEGER" property="orgId"/>
+        <result column="org_name" jdbcType="VARCHAR" property="orgName"/>
+        <!--配置1对多关系映射
+            property：在UserDO里面的List<RelDO>的属性名
+            ofType:当前relation表的java类型
+            column:外键
+        -->
+        <collection property="relation" ofType="cn.unicom.mip.cys.model.RelDO" column="org_id">
+            <id property="relId" column="rel_id"></id>
+            <result property="userId" column="user_id"></result>
+            <result property="orgId" column="org_id"></result>
+            <result property="orgType" column="org_type"></result>
+        </collection>
+    </resultMap>
+    <sql id="Base_Column_List">
+        org_id, org_name
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+            resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_org
+        where org_id = #{orgId,jdbcType=INTEGER}
+    </select>
+    <select id="selectAllOrg" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from t_org
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete from t_org
+        where org_id = #{orgId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="cn.unicom.mip.cys.model.OrgDO">
+        insert into t_org (org_id,
+        org_name)
+        values (#{orgId,jdbcType=INTEGER},
+        #{orgName,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyProperty="orgId" useGeneratedKeys="true"
+            parameterType="cn.unicom.mip.cys.model.OrgDO">
+        insert into t_org
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">
+                org_id,
+            </if>
+            <if test="orgName != null">
+                org_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orgId != null">
+                #{orgId,jdbcType=INTEGER},
+            </if>
+            <if test="orgName != null">
+                #{orgName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.unicom.mip.cys.model.OrgDO">
+        update t_org
+        set
+        <if test="orgName != null">
+            org_name = #{orgName,jdbcType=VARCHAR},
+        </if>
+        where org_id = #{orgId,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.unicom.mip.cys.model.OrgDO">
+        update t_org
+        set
+        org_name = #{orgName,jdbcType=VARCHAR},
+        where
+        org_id = #{orgId,jdbcType=INTEGER}
+    </update>
+    <!--查询某个用户所属的所有组织，标识出主岗和兼职-->
+    <select id="selectAllOrgssByUserId" parameterType="java.lang.Integer"
+            resultMap="BaseResultMap">
+        select
+        o.org_id,o.org_name,r.rel_id,r.user_id,r.org_id,r.org_type
+        from t_rel r left join t_org o
+        on r.org_id = o.org_id
+        where r.user_id = #{userId,jdbcType=INTEGER}
+    </select>
+</mapper>
